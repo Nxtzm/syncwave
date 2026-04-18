@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Syncwave — Listen Together</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- AUTH SCREEN -->
+    <div class="screen" id="screen-auth">
+        <div class="auth-card">
+            <div class="auth-logo">
+                <div class="auth-logo-mark"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
+                syncwave
+            </div>
+            <div class="auth-tabs">
+                <button class="auth-tab active" id="tab-login-btn">Sign in</button>
+                <button class="auth-tab" id="tab-register-btn">Create account</button>
+            </div>
+            <div id="auth-form">
+                <div class="field"><label>Email</label><input type="email" id="auth-email" placeholder="you@example.com"></div>
+                <div class="field"><label>Password</label><input type="password" id="auth-pass" placeholder="••••••••"></div>
+                <button class="auth-btn" id="main-auth-btn">Sign in</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOBBY SCREEN -->
+    <div class="screen hidden" id="screen-lobby">
+        <div class="lobby-card">
+            <div class="lobby-header">
+                <span class="logo-text">syncwave</span>
+                <div class="user-pill">
+                    <div id="lobby-avatar" class="avatar-sm"></div>
+                    <span id="lobby-username">User</span>
+                    <button class="icon-btn" onclick="app.logout()"><svg viewBox="0 0 24 24" width="14"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
+                </div>
+            </div>
+            <p class="lobby-sub">Join a room or create a new session.</p>
+            <div class="room-list" id="active-rooms"></div>
+            <div class="divider">or</div>
+            <div class="field"><label>Room Name</label><input type="text" id="new-room-name" placeholder="My chill session"></div>
+            <button class="auth-btn" onclick="app.createRoom()">Create Room</button>
+        </div>
+    </div>
+
+    <!-- MAIN APP APP -->
+    <div class="app hidden" id="screen-app">
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <div class="logo">
+                <div class="logo-mark"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
+                <span class="desktop-only">syncwave</span>
+            </div>
+            <div class="room-chip" onclick="app.copyInvite()">
+                <div class="live-dot"></div>
+                <span id="topbar-room-name">Room</span>
+            </div>
+            <div class="topbar-right">
+                <div class="sync-badge desktop-only"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Synced</div>
+                <button class="mobile-menu-btn" onclick="app.openMobilePanel('members')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+            </div>
+        </header>
+
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-section">
+                <div class="section-label">Listeners (<span id="member-count">0</span>)</div>
+                <div id="member-list"></div>
+            </div>
+            <button class="leave-btn" onclick="app.leaveRoom()">Leave room</button>
+        </aside>
+
+        <main class="main">
+            <div class="search-bar">
+                <div class="search-row">
+                    <input class="search-input" id="search-input" placeholder="Search YouTube tracks...">
+                    <button class="search-btn" onclick="app.doSearch()">Search</button>
+                </div>
+            </div>
+            <div id="results-area" class="results"></div>
+        </main>
+
+        <aside class="queue-panel">
+            <div class="queue-header">Up next</div>
+            <div id="queue-list" class="queue-list"></div>
+        </aside>
+
+        <!-- PLAYER -->
+        <footer class="player">
+            <div class="now-playing">
+                <div class="np-art" id="np-art"></div>
+                <div class="np-text">
+                    <div class="np-title" id="np-title">Nothing playing</div>
+                    <div class="np-artist" id="np-artist">Search to begin</div>
+                </div>
+            </div>
+
+            <div class="controls-center">
+                <div class="ctrl-btns">
+                    <button class="ctrl-btn" onclick="app.prevTrack()"><svg viewBox="0 0 24 24" width="20" fill="currentColor"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5" stroke="currentColor" stroke-width="2"/></svg></button>
+                    <button class="play-btn" onclick="app.togglePlay()" id="play-btn">
+                        <svg viewBox="0 0 24 24" width="20" fill="currentColor" id="play-icon"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    </button>
+                    <button class="ctrl-btn" onclick="app.nextTrack()"><svg viewBox="0 0 24 24" width="20" fill="currentColor"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2"/></svg></button>
+                </div>
+                <div class="progress-wrap">
+                    <span class="time" id="time-cur">0:00</span>
+                    <div class="progress-bar" id="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <span class="time" id="time-dur">0:00</span>
+                </div>
+            </div>
+
+            <div class="vol-wrap desktop-only">
+                <svg viewBox="0 0 24 24" width="16" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 010 7.07"/></svg>
+                <div class="vol-bar" id="vol-bar"><div class="vol-fill" id="vol-fill" style="width: 80%"></div></div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Hidden YT Player -->
+    <div id="yt-player-container" style="position: absolute; top: -9999px; left: -9999px;"></div>
+    
+    <div class="toast" id="toast"></div>
+
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script src="app.js"></script>
+</body>
+</html>
